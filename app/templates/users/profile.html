@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% set active_page = 'profile' %}
+{% block title %}My Profile | {{ app_name }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card profile-hero-card">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <span class="dashboard-eyebrow">Account center</span>
+            <h4 class="mb-1">Manage your profile and security</h4>
+            <p class="mb-0 text-muted">Update your personal details and rotate your password whenever needed.</p>
+          </div>
+          <div class="profile-avatar-badge">
+            <span class="lottie-icon lottie-icon-xl" data-lottie="user" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card profile-card h-100">
+      <div class="card-header">
+        <h5 class="mb-1">Personal Information</h5>
+        <p class="mb-0 text-muted">These details are used across your dashboard and user records.</p>
+      </div>
+      <div class="card-body">
+        <form id="profile-form" class="row g-3" novalidate>
+          <div class="col-md-6">
+            <label class="form-label" for="profile-full-name">Full Name</label>
+            <input class="form-control" id="profile-full-name" required minlength="3" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="profile-username">Username</label>
+            <input class="form-control" id="profile-username" required minlength="3" />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="profile-email">Email</label>
+            <input type="email" class="form-control" id="profile-email" required />
+          </div>
+          <div class="col-12 d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+            <span class="text-muted align-self-center" id="profile-meta"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card profile-card h-100">
+      <div class="card-header">
+        <h5 class="mb-1">Change Password</h5>
+        <p class="mb-0 text-muted">Use a strong password with at least 8 characters.</p>
+      </div>
+      <div class="card-body">
+        <form id="password-form" class="row g-3" novalidate>
+          <div class="col-12">
+            <label class="form-label" for="current-password">Current Password</label>
+            <input type="password" class="form-control" id="current-password" autocomplete="current-password" required />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="new-password">New Password</label>
+            <input type="password" class="form-control" id="new-password" autocomplete="new-password" required minlength="8" />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="confirm-password">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirm-password" autocomplete="new-password" required />
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-outline-primary">Update Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/profile-enhanced.js') }}"></script>
+{% endblock %}

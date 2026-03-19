@@ -1,0 +1,34 @@
+.app-search {
+  max-width: 280px;
+}
+
+.metric-pair {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.datatable-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.datatable-pagination .btn-group {
+  gap: 0.5rem;
+}
+
+.status-badge {
+  min-width: 82px;
+  display: inline-block;
+  text-align: center;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #8592a3;
+}

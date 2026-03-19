@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+{% block title %}Dashboard | {{ app_name }}{% endblock %}
+{% block content %}
+<div class="row g-4 dashboard-top">
+  <div class="col-12">
+    <div class="card dashboard-hero">
+      <div class="card-body">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <span class="dashboard-eyebrow">Operations cockpit</span>
+            <h3 class="dashboard-hero-title">Welcome {{ current_user.full_name.split(' ')[0] }}, your trade pulse is ready.</h3>
+            <p class="mb-4">
+              Filter by date range, compare trade performance, and keep an eye on inventory, customers, and active markets from one view.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{{ url_for('products.page') }}" class="btn btn-primary">Manage Products</a>
+              <a href="{{ url_for('users.profile') }}" class="btn btn-outline-primary">Update Profile</a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <form id="dashboard-filters" class="dashboard-filter-panel">
+              <div class="dashboard-filter-head">
+                <div>
+                  <h5 class="mb-1">Date Filter</h5>
+                  <p class="mb-0 text-muted">Use the calendar inputs to focus the dashboard.</p>
+                </div>
+                <span class="badge bg-label-primary" id="dashboard-range-chip">All records</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="start-date">Start Date</label>
+                  <input type="date" class="form-control" id="start-date" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label" for="end-date">End Date</label>
+                  <input type="date" class="form-control" id="end-date" />
+                </div>
+              </div>
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button class="btn btn-primary" type="submit">Apply Filter</button>
+                <button class="btn btn-outline-secondary" type="button" id="reset-dashboard-filters">Reset</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-md-6 col-xl-3">
+    <div class="card metric-card metric-card-primary">
+      <div class="card-body">
+        <span class="metric-label">Imports</span>
+        <h3 class="metric-value" id="metric-imports">-</h3>
+        <small>Total landed value</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card metric-card metric-card-success">
+      <div class="card-body">
+        <span class="metric-label">Exports</span>
+        <h3 class="metric-value" id="metric-exports">-</h3>
+        <small>Total shipped value</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card metric-card metric-card-info">
+      <div class="card-body">
+        <span class="metric-label">Sales</span>
+        <h3 class="metric-value" id="metric-sales">-</h3>
+        <small>Booked sales value</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card metric-card metric-card-warning">
+      <div class="card-body">
+        <span class="metric-label">Avg Ticket</span>
+        <h3 class="metric-value" id="metric-average-ticket">-</h3>
+        <small>Average amount per transaction</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-md-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <span class="stat-label">Transactions</span>
+        <h4 class="stat-value" id="metric-transactions">0</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <span class="stat-label">Inventory Units</span>
+        <h4 class="stat-value" id="metric-inventory-units">0</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <span class="stat-label">Market Coverage</span>
+        <h4 class="stat-value" id="metric-market-coverage">0</h4>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <span class="stat-label">Active Products</span>
+        <h4 class="stat-value" id="metric-active-products">0</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-xl-8">
+    <div class="card dashboard-chart-card">
+      <div class="card-header">
+        <h5 class="mb-1">Trade Trend</h5>
+        <p class="mb-0 text-muted">A polished mixed chart for import, export, and sales values.</p>
+      </div>
+      <div id="tradeTrendChart" class="chart-shell"></div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card dashboard-chart-card h-100">
+      <div class="card-header">
+        <h5 class="mb-1">Category Breakdown</h5>
+        <p class="mb-0 text-muted">Inventory distribution by category.</p>
+      </div>
+      <div id="categoryBreakdownChart" class="chart-shell chart-shell-compact"></div>
+      <div class="card-body pt-0">
+        <div class="metric-pair">
+          <span>Products</span>
+          <strong id="metric-products">0</strong>
+        </div>
+        <div class="metric-pair">
+          <span>Users</span>
+          <strong id="metric-users">0</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-xl-8">
+    <div class="card dashboard-chart-card">
+      <div class="card-header">
+        <h5 class="mb-1">Six-Month Comparison</h5>
+        <p class="mb-0 text-muted">Line chart comparing recent trade value with the same months last year.</p>
+      </div>
+      <div id="comparisonLineChart" class="chart-shell"></div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card h-100 activity-card">
+      <div class="card-header">
+        <h5 class="mb-1">Recent Trade Activity</h5>
+        <p class="mb-0 text-muted">Latest filtered transactions.</p>
+      </div>
+      <div class="card-body">
+        <div id="recent-activity" class="list-group list-group-flush"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard-enhanced.js') }}"></script>
+{% endblock %}

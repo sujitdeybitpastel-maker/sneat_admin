@@ -1,0 +1,999 @@
+:root {
+  --phi: 1.618;
+  --space-1: 0.618rem;
+  --space-2: 1rem;
+  --space-3: 1.618rem;
+  --space-4: 2.618rem;
+  --space-5: 4.236rem;
+  --radius-sm: 1rem;
+  --radius-md: 1.618rem;
+  --radius-lg: 2.618rem;
+  --app-bg: #eef2f7;
+  --app-surface: rgba(255, 255, 255, 0.16);
+  --app-surface-strong: rgba(255, 255, 255, 0.24);
+  --app-surface-solid: rgba(255, 255, 255, 0.76);
+  --app-border: rgba(255, 255, 255, 0.34);
+  --app-border-strong: rgba(255, 255, 255, 0.48);
+  --app-text: #142033;
+  --app-muted: #4f607b;
+  --app-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+  --app-shadow-soft: 0 16px 48px rgba(15, 23, 42, 0.1);
+  --app-accent: #4a7cff;
+  --app-accent-2: #00b8d9;
+  --app-success: #20b66f;
+  --app-warning: #e0a500;
+  --app-danger: #d95b75;
+  --app-page-wash: rgba(255, 255, 255, 0.4);
+  --app-filter-bg: rgba(255, 255, 255, 0.18);
+  --app-filter-border: rgba(255, 255, 255, 0.28);
+  --app-filter-input-bg: rgba(255, 255, 255, 0.78);
+  --app-filter-input-text: #132238;
+  --app-filter-chip-bg: rgba(255, 255, 255, 0.2);
+  --app-filter-chip-text: #ffffff;
+  --app-stat-bg: rgba(255, 255, 255, 0.26);
+  --app-chart-card-bg: rgba(255, 255, 255, 0.18);
+  --app-hero: linear-gradient(135deg, rgba(13, 33, 73, 0.92) 0%, rgba(33, 71, 168, 0.88) 48%, rgba(25, 179, 201, 0.82) 100%);
+  --app-grid:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 24%),
+    radial-gradient(circle at top right, rgba(74, 124, 255, 0.18), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(0, 184, 217, 0.16), transparent 32%);
+}
+
+html[data-resolved-theme="dark"] {
+  --app-bg: #09111f;
+  --app-surface: rgba(12, 21, 38, 0.36);
+  --app-surface-strong: rgba(20, 32, 54, 0.5);
+  --app-surface-solid: rgba(20, 30, 50, 0.88);
+  --app-border: rgba(206, 220, 255, 0.15);
+  --app-border-strong: rgba(206, 220, 255, 0.24);
+  --app-text: #eff4ff;
+  --app-muted: #b6c2db;
+  --app-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+  --app-shadow-soft: 0 18px 56px rgba(0, 0, 0, 0.32);
+  --app-page-wash: rgba(8, 14, 28, 0.2);
+  --app-filter-bg: rgba(8, 18, 35, 0.34);
+  --app-filter-border: rgba(206, 220, 255, 0.18);
+  --app-filter-input-bg: rgba(13, 24, 42, 0.82);
+  --app-filter-input-text: #eff4ff;
+  --app-filter-chip-bg: rgba(206, 220, 255, 0.14);
+  --app-filter-chip-text: #eff4ff;
+  --app-stat-bg: rgba(14, 24, 42, 0.42);
+  --app-chart-card-bg: rgba(12, 21, 38, 0.32);
+  --app-hero: linear-gradient(135deg, rgba(6, 13, 28, 0.95) 0%, rgba(18, 48, 112, 0.88) 52%, rgba(10, 112, 130, 0.82) 100%);
+  --app-grid:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 24%),
+    radial-gradient(circle at top right, rgba(74, 124, 255, 0.22), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(0, 184, 217, 0.16), transparent 32%);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body,
+.form-control,
+.form-select,
+.dropdown-item,
+.btn,
+.table {
+  font-family: "DM Sans", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.fw-bold,
+.fw-bolder,
+.card-title,
+.modal-title,
+.app-brand-text,
+.menu-text {
+  font-family: "Red Hat Display", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+body {
+  background:
+    linear-gradient(180deg, var(--app-page-wash), transparent 42%),
+    var(--app-grid),
+    var(--app-bg);
+  color: var(--app-text);
+}
+
+.layout-page,
+.content-wrapper,
+.card,
+.navbar-detached,
+.bg-navbar-theme,
+.bg-menu-theme,
+.form-control,
+.form-select,
+.table,
+.dropdown-menu,
+.modal-content,
+.popover,
+.tooltip-inner,
+.alert,
+.input-group-text,
+.btn,
+.list-group-item {
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s ease;
+}
+
+.card,
+.navbar-detached,
+.bg-navbar-theme,
+.bg-menu-theme,
+.dropdown-menu,
+.modal-content,
+.popover,
+.alert,
+.input-group-text,
+.list-group-item,
+.theme-toggle-btn {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-soft);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+.modal-backdrop.show {
+  opacity: 0.28;
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.popover,
+.alert,
+.btn,
+.form-control,
+.form-select,
+.input-group-text {
+  border-radius: var(--radius-md);
+}
+
+.container-p-y,
+.container-xxl {
+  padding-top: var(--space-3) !important;
+  padding-bottom: var(--space-3) !important;
+}
+
+.row {
+  --bs-gutter-x: var(--space-3);
+  --bs-gutter-y: var(--space-3);
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  background: var(--app-surface-strong);
+  border-color: var(--app-border);
+  color: var(--app-text);
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.form-select {
+  padding-right: 2.75rem;
+  background-position: right 1rem center;
+  background-size: 0.95rem 0.75rem;
+}
+
+.form-select option {
+  background: var(--app-surface-solid);
+  color: var(--app-text);
+}
+
+.form-control::placeholder {
+  color: color-mix(in srgb, var(--app-muted) 82%, transparent);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background: var(--app-surface-solid);
+  color: var(--app-text);
+  border-color: color-mix(in srgb, var(--app-accent) 45%, white);
+  box-shadow:
+    0 0 0 0.18rem color-mix(in srgb, var(--app-accent) 18%, transparent),
+    var(--app-shadow-soft);
+}
+
+.table {
+  color: var(--app-text);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: color-mix(in srgb, var(--app-border) 88%, transparent);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.table thead th {
+  font-family: "Red Hat Display", sans-serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+
+.text-muted,
+small,
+.form-label,
+.dropdown-item,
+.menu-vertical .menu-item .menu-link,
+.navbar .nav-item,
+.navbar .nav-link,
+.app-brand-text.demo.text-body {
+  color: var(--app-muted) !important;
+}
+
+.text-dark,
+.dropdown-item:hover,
+.dropdown-item:focus,
+.table strong,
+.table td,
+.table th {
+  color: var(--app-text) !important;
+}
+
+.menu-vertical .menu-item .menu-link {
+  border-radius: var(--radius-sm);
+  margin: 0.236rem 0.618rem;
+  min-height: 3.25rem;
+  padding-inline: 1rem;
+}
+
+.menu-vertical .menu-item.active > .menu-link,
+.menu-vertical .menu-item .menu-link:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(74, 124, 255, 0.16));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.btn {
+  font-weight: 700;
+  padding: 0.9rem 1.45rem;
+  letter-spacing: 0.01em;
+  border-width: 1px;
+  box-shadow: var(--app-shadow-soft);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.82), rgba(0, 184, 217, 0.74));
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--app-border-strong);
+  color: var(--app-text);
+}
+
+.btn-sm {
+  padding: 0.618rem 1rem;
+  border-radius: 1rem;
+}
+
+.badge,
+.status-badge {
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 700;
+}
+
+.bg-label-primary {
+  background: rgba(74, 124, 255, 0.16) !important;
+  color: color-mix(in srgb, var(--app-accent) 78%, white) !important;
+}
+
+.bg-label-secondary {
+  background: rgba(217, 91, 117, 0.12) !important;
+  color: color-mix(in srgb, var(--app-danger) 78%, white) !important;
+}
+
+.dashboard-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.dashboard-hero,
+.profile-hero-card {
+  overflow: hidden;
+  background: var(--app-hero) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.dashboard-hero::before,
+.profile-hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.2), transparent 24%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 60%);
+  pointer-events: none;
+}
+
+.dashboard-hero .card-body,
+.profile-hero-card .card-body {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-4);
+  color: #fff;
+}
+
+.dashboard-hero-title {
+  max-width: 34rem;
+  font-size: clamp(2rem, 3vw, 3.236rem);
+  line-height: 1.08;
+  margin-bottom: 1rem;
+}
+
+.dashboard-filter-panel,
+.profile-card,
+.dashboard-chart-card,
+.activity-card,
+.stat-card {
+  background: linear-gradient(135deg, var(--app-chart-card-bg), rgba(255, 255, 255, 0.04));
+}
+
+.dashboard-filter-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: var(--space-2);
+}
+
+.dashboard-filter-panel {
+  background: linear-gradient(135deg, var(--app-filter-bg), rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--app-filter-border);
+}
+
+.dashboard-filter-panel .form-label,
+.dashboard-filter-panel .text-muted,
+.dashboard-filter-panel small,
+.dashboard-filter-panel h5,
+.dashboard-filter-panel p {
+  color: #fff !important;
+}
+
+.dashboard-filter-panel .form-control,
+.dashboard-filter-panel .form-select {
+  background: var(--app-filter-input-bg);
+  color: var(--app-filter-input-text);
+  border-color: var(--app-filter-border);
+}
+
+.dashboard-filter-panel .form-control:focus,
+.dashboard-filter-panel .form-select:focus {
+  background: var(--app-filter-input-bg);
+  color: var(--app-filter-input-text);
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: brightness(0) saturate(100%) invert(100%);
+  opacity: 0.92;
+}
+
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(16%) sepia(13%) saturate(927%) hue-rotate(176deg) brightness(93%) contrast(90%);
+}
+
+#dashboard-range-chip {
+  background: var(--app-filter-chip-bg) !important;
+  color: var(--app-filter-chip-text) !important;
+}
+
+.metric-card,
+.stat-card,
+.profile-card,
+.profile-hero-card,
+.dashboard-chart-card,
+.activity-card {
+  border-radius: var(--radius-lg);
+}
+
+.metric-card {
+  min-height: 13rem;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.metric-card::before,
+.metric-card::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.metric-card::before {
+  width: 13rem;
+  height: 13rem;
+  top: -5rem;
+  right: -3rem;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.metric-card::after {
+  width: 8rem;
+  height: 8rem;
+  bottom: -2.3rem;
+  left: -1.2rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.metric-card .card-body {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-3);
+}
+
+.metric-card-primary {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.74), rgba(111, 134, 255, 0.52)) !important;
+  color: #fff;
+}
+
+.metric-card-success {
+  background: linear-gradient(135deg, rgba(32, 182, 111, 0.72), rgba(58, 239, 125, 0.48)) !important;
+  color: #fff;
+}
+
+.metric-card-info {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.72), rgba(34, 211, 238, 0.48)) !important;
+  color: #fff;
+}
+
+.metric-card-warning {
+  background: linear-gradient(135deg, rgba(224, 165, 0, 0.76), rgba(249, 115, 22, 0.5)) !important;
+  color: #fff;
+}
+
+.metric-card .metric-label,
+.metric-card .metric-value,
+.metric-card small {
+  color: #fff !important;
+}
+
+.metric-card small {
+  opacity: 0.92;
+}
+
+.metric-label,
+.stat-label {
+  display: block;
+  font-family: "Red Hat Display", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.618rem;
+}
+
+.metric-value,
+.stat-value {
+  margin: 0;
+  font-size: clamp(1.8rem, 2vw, 2.618rem);
+  font-weight: 800;
+}
+
+.stat-card .card-body,
+.dashboard-chart-card .card-header,
+.activity-card .card-header,
+.profile-card .card-header,
+.profile-card .card-body {
+  padding: var(--space-3);
+}
+
+.stat-card,
+.dashboard-chart-card,
+.activity-card,
+.profile-card {
+  background: linear-gradient(135deg, var(--app-stat-bg), rgba(255, 255, 255, 0.04)) !important;
+}
+
+.stat-card .stat-label,
+.stat-card .stat-value,
+.dashboard-chart-card h5,
+.dashboard-chart-card p,
+.activity-card h5,
+.activity-card p,
+.profile-card h5,
+.profile-card p {
+  color: var(--app-text) !important;
+}
+
+.chart-shell {
+  min-height: 21rem;
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+.chart-shell-compact {
+  min-height: 18rem;
+}
+
+.metric-pair {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--app-border) 90%, transparent);
+}
+
+.theme-toggle-btn {
+  min-width: 8rem;
+}
+
+.theme-menu .dropdown-item.active {
+  background: rgba(74, 124, 255, 0.16);
+  color: var(--app-text) !important;
+}
+
+.dropdown-menu,
+.modal-content,
+.popover,
+.tooltip-inner {
+  background: color-mix(in srgb, var(--app-surface-solid) 58%, transparent) !important;
+}
+
+.modal-header,
+.modal-footer,
+.card-header,
+.card-body.border-top {
+  border-color: color-mix(in srgb, var(--app-border) 90%, transparent) !important;
+}
+
+.activity-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 1rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--app-border) 90%, transparent);
+}
+
+.activity-row:last-child {
+  border-bottom: 0;
+}
+
+.profile-avatar-badge {
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 1.618rem;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.lottie-icon {
+  width: 1.618rem;
+  height: 1.618rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  position: relative;
+  color: currentColor;
+}
+
+.line-icon-shell,
+.lottie-player-shell {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-icon-shell {
+  opacity: 1;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.line-icon-shell svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lottie-player-shell {
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.lottie-player-shell svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.lottie-icon.is-animating .line-icon-shell,
+.lottie-icon:hover .line-icon-shell,
+.lottie-icon:focus-within .line-icon-shell {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.lottie-icon.is-animating .lottie-player-shell,
+.lottie-icon:hover .lottie-player-shell,
+.lottie-icon:focus-within .lottie-player-shell {
+  opacity: 1;
+}
+
+.lottie-icon-xl {
+  width: 3.4rem;
+  height: 3.4rem;
+}
+
+.theme-toggle-btn .lottie-icon,
+.btn .lottie-icon,
+.dropdown-item .lottie-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.table-responsive,
+.authentication-inner,
+.authentication-wrapper {
+  position: relative;
+}
+
+.authentication-wrapper {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(74, 124, 255, 0.18), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(0, 184, 217, 0.14), transparent 28%);
+}
+
+.authentication-inner .card {
+  background: color-mix(in srgb, var(--app-surface-solid) 64%, transparent) !important;
+}
+
+.alert {
+  color: var(--app-text);
+}
+
+.empty-state {
+  color: var(--app-muted);
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 0.4rem;
+  color: color-mix(in srgb, var(--app-danger) 86%, white);
+  font-size: 0.86rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: color-mix(in srgb, var(--app-danger) 72%, white) !important;
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--app-danger) 16%, transparent);
+}
+
+/* ── Data Table: text wrapping with fixed dimensions ── */
+#products-table td,
+#products-table th {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 180px;
+  vertical-align: middle;
+}
+
+#products-table td:nth-child(2) {
+  min-width: 140px;
+  max-width: 200px;
+}
+
+#products-table td:nth-child(4),
+#products-table td:nth-child(5) {
+  min-width: 100px;
+  max-width: 150px;
+}
+
+#products-table td:last-child {
+  min-width: 170px;
+  white-space: nowrap;
+}
+
+/* ── Dashboard Hero: beautified welcome section ── */
+.dashboard-hero {
+  position: relative;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+}
+
+.dashboard-hero::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 50%;
+  height: 180%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dashboard-hero .card-body {
+  padding: var(--space-5) var(--space-4) !important;
+}
+
+.dashboard-eyebrow {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(74, 124, 255, 0.28)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.dashboard-hero-title {
+  background: linear-gradient(135deg, #ffffff 0%, rgba(200, 220, 255, 0.9) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  font-weight: 900;
+}
+
+.dashboard-hero p {
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 32rem;
+}
+
+.dashboard-hero .btn-primary {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.12)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff !important;
+  backdrop-filter: blur(8px);
+}
+
+.dashboard-hero .btn-primary:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.2)) !important;
+}
+
+.dashboard-hero .btn-outline-primary {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.dashboard-hero .btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+html[data-resolved-theme="dark"] .dashboard-hero-title {
+  background: linear-gradient(135deg, #e8f0ff 0%, rgba(140, 180, 255, 0.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html[data-resolved-theme="dark"] .dashboard-hero {
+  border-color: rgba(100, 140, 255, 0.18) !important;
+}
+
+html[data-resolved-theme="dark"] .dashboard-hero p {
+  color: rgba(200, 215, 245, 0.78) !important;
+}
+
+/* ── Dropdown styling improvements ── */
+.dropdown-menu {
+  padding: 0.5rem;
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--app-border-strong) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  min-width: 10rem;
+}
+
+.dropdown-item {
+  border-radius: var(--radius-sm) !important;
+  padding: 0.6rem 1rem !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--app-text) !important;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  margin-bottom: 2px;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.12), rgba(0, 184, 217, 0.08)) !important;
+  color: var(--app-accent) !important;
+  transform: translateX(2px);
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.2), rgba(0, 184, 217, 0.14)) !important;
+  color: var(--app-accent) !important;
+}
+
+.dropdown-divider {
+  border-color: var(--app-border);
+  margin: 0.4rem 0;
+}
+
+html[data-resolved-theme="dark"] .dropdown-menu {
+  background: rgba(16, 26, 46, 0.92) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-resolved-theme="dark"] .dropdown-item:hover,
+html[data-resolved-theme="dark"] .dropdown-item:focus {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.18), rgba(0, 184, 217, 0.12)) !important;
+}
+
+/* ── Form select / native dropdown options ── */
+.form-select option {
+  padding: 0.6rem 1rem;
+  background: var(--app-surface-solid);
+  color: var(--app-text);
+  font-size: 0.95rem;
+}
+
+.form-select option:checked {
+  background: linear-gradient(135deg, rgba(74, 124, 255, 0.2), rgba(0, 184, 217, 0.14));
+  color: var(--app-accent);
+}
+
+/* ── Calendar / Date input styling ── */
+.dashboard-filter-panel .form-control[type="date"] {
+  position: relative;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm);
+  background: var(--app-filter-input-bg);
+  color: var(--app-filter-input-text);
+  border: 1.5px solid var(--app-filter-border);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.dashboard-filter-panel .form-control[type="date"]:focus {
+  border-color: rgba(74, 124, 255, 0.6);
+  box-shadow:
+    0 0 0 3px rgba(74, 124, 255, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--app-filter-input-bg);
+}
+
+.dashboard-filter-panel .form-control[type="date"]:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Calendar picker icon */
+.dashboard-filter-panel input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.15);
+}
+
+/* Date input inner elements (WebKit) */
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-text {
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0 0.2em;
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-month-field,
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-day-field,
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-year-field {
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-month-field:focus,
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-day-field:focus,
+.dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background: rgba(74, 124, 255, 0.25);
+  color: #fff;
+  outline: none;
+}
+
+/* Light mode calendar adjustments */
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-text {
+  color: rgba(20, 32, 51, 0.4);
+}
+
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-month-field:focus,
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-day-field:focus,
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background: rgba(74, 124, 255, 0.15);
+  color: #142033;
+}
+
+html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Filter panel refinements */
+.dashboard-filter-panel {
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-3);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+.dashboard-filter-panel .btn-primary {
+  min-width: 7rem;
+}
+
+.dashboard-filter-panel .btn-outline-secondary {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dashboard-filter-panel .btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+
+@media (max-width: 767.98px) {
+  .dashboard-hero .card-body,
+  .profile-hero-card .card-body,
+  .profile-card .card-header,
+  .profile-card .card-body,
+  .dashboard-chart-card .card-header,
+  .activity-card .card-header,
+  .stat-card .card-body {
+    padding: var(--space-3);
+  }
+
+  .dashboard-filter-head,
+  .activity-row {
+    flex-direction: column;
+  }
+
+  .chart-shell,
+  .chart-shell-compact {
+    min-height: 17rem;
+  }
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  class="light-style customizer-hide"
+  dir="ltr"
+  data-theme="theme-default"
+  data-assets-path="/assets/"
+  data-template="vertical-menu-template-free"
+  data-app-theme="{{ current_theme_mode }}"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset_url('img/favicon/favicon.ico') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Red+Hat+Display:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ asset_url('vendor/fonts/boxicons.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('vendor/css/core.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('vendor/css/theme-default.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('css/demo.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('vendor/css/pages/page-auth.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app-theme.css') }}" />
+    <script>
+      (function () {
+        const savedTheme = "{{ current_theme_mode }}";
+        const root = document.documentElement;
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const resolvedTheme = savedTheme === "system" ? (systemDark ? "dark" : "light") : savedTheme;
+        root.dataset.appTheme = savedTheme;
+        root.dataset.resolvedTheme = resolvedTheme;
+        root.classList.toggle("dark-style", resolvedTheme === "dark");
+        root.classList.toggle("light-style", resolvedTheme !== "dark");
+      })();
+    </script>
+    <script src="{{ asset_url('vendor/js/helpers.js') }}"></script>
+    <script src="{{ asset_url('js/config.js') }}"></script>
+  </head>
+  <body>
+    <div class="container-xxl">
+      <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+          <div class="card">
+            <div class="card-body">
+              <div class="app-brand justify-content-center">
+                <a href="{{ url_for('dashboard.index') if current_user.is_authenticated else url_for('auth.login') }}" class="app-brand-link gap-2">
+                  <span class="app-brand-logo demo">
+                    <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="#696cff" d="M13.7918663,0.358365126 L3.39788168,7.44174259 C0.566865006,9.69408886 -0.379795268,12.4788597 0.557900856,15.7960551 C0.68998853,16.2305145 1.09562888,17.7872135 3.12357076,19.2293357 C3.8146334,19.7207684 5.32369333,20.3834223 7.65075054,21.2172976 L7.59773219,21.2525164 L2.63468769,24.5493413 C0.445452254,26.3002124 0.0884951797,28.5083815 1.56381646,31.1738486 C2.83770406,32.8170431 5.20850219,33.2640127 7.09180128,32.5391577 C8.347334,32.0559211 11.4559176,30.0011079 16.4175519,26.3747182 C18.0338572,24.4997857 18.6973423,22.4544883 18.4080071,20.2388261 C17.963753,17.5346866 16.1776345,15.5799961 13.0496516,14.3747546 L10.9194936,13.4715819 L18.6192054,7.984237 L13.7918663,0.358365126 Z"></path>
+                    </svg>
+                  </span>
+                  <span class="app-brand-text demo text-body fw-bolder">Sneat</span>
+                </a>
+              </div>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+              {% for category, message in messages %}
+              <div class="alert alert-{{ category }} mt-3" role="alert">{{ message }}</div>
+              {% endfor %}
+              {% endif %}
+              {% endwith %}
+              {% block content %}{% endblock %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ asset_url('vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="{{ asset_url('vendor/libs/popper/popper.js') }}"></script>
+    <script src="{{ asset_url('vendor/js/bootstrap.js') }}"></script>
+    <script src="{{ asset_url('vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+    <script src="{{ asset_url('vendor/js/menu.js') }}"></script>
+    <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+    <script src="{{ asset_url('js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>
