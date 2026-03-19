@@ -8,35 +8,35 @@
   --radius-sm: 1rem;
   --radius-md: 1.618rem;
   --radius-lg: 2.618rem;
-  --app-bg: #eef2f7;
-  --app-surface: rgba(255, 255, 255, 0.16);
-  --app-surface-strong: rgba(255, 255, 255, 0.24);
+  --app-bg: #d8dfe9;
+  --app-surface: rgba(255, 255, 255, 0.32);
+  --app-surface-strong: rgba(255, 255, 255, 0.42);
   --app-surface-solid: rgba(255, 255, 255, 0.76);
-  --app-border: rgba(255, 255, 255, 0.34);
-  --app-border-strong: rgba(255, 255, 255, 0.48);
-  --app-text: #142033;
-  --app-muted: #4f607b;
+  --app-border: rgba(15, 23, 42, 0.08);
+  --app-border-strong: rgba(15, 23, 42, 0.12);
+  --app-text: #0f1825;
+  --app-muted: #3d4f68;
   --app-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
-  --app-shadow-soft: 0 16px 48px rgba(15, 23, 42, 0.1);
+  --app-shadow-soft: 0 8px 28px rgba(15, 23, 42, 0.08);
   --app-accent: #4a7cff;
   --app-accent-2: #00b8d9;
   --app-success: #20b66f;
   --app-warning: #e0a500;
   --app-danger: #d95b75;
-  --app-page-wash: rgba(255, 255, 255, 0.4);
+  --app-page-wash: rgba(180, 195, 218, 0.25);
   --app-filter-bg: rgba(255, 255, 255, 0.18);
   --app-filter-border: rgba(255, 255, 255, 0.28);
   --app-filter-input-bg: rgba(255, 255, 255, 0.78);
   --app-filter-input-text: #132238;
   --app-filter-chip-bg: rgba(255, 255, 255, 0.2);
   --app-filter-chip-text: #ffffff;
-  --app-stat-bg: rgba(255, 255, 255, 0.26);
-  --app-chart-card-bg: rgba(255, 255, 255, 0.18);
+  --app-stat-bg: rgba(255, 255, 255, 0.35);
+  --app-chart-card-bg: rgba(255, 255, 255, 0.28);
   --app-hero: linear-gradient(135deg, rgba(13, 33, 73, 0.92) 0%, rgba(33, 71, 168, 0.88) 48%, rgba(25, 179, 201, 0.82) 100%);
   --app-grid:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 24%),
-    radial-gradient(circle at top right, rgba(74, 124, 255, 0.18), transparent 36%),
-    radial-gradient(circle at bottom left, rgba(0, 184, 217, 0.16), transparent 32%);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.35), transparent 24%),
+    radial-gradient(circle at top right, rgba(40, 70, 160, 0.14), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(0, 120, 150, 0.12), transparent 35%);
 }
 
 html[data-resolved-theme="dark"] {
@@ -265,8 +265,9 @@ small,
 }
 
 .btn {
-  font-weight: 700;
-  padding: 0.9rem 1.45rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.88rem;
   letter-spacing: 0.01em;
   border-width: 1px;
   box-shadow: var(--app-shadow-soft);
@@ -289,7 +290,8 @@ small,
 }
 
 .btn-sm {
-  padding: 0.618rem 1rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
   border-radius: 1rem;
 }
 
@@ -532,6 +534,36 @@ html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-w
 .profile-card h5,
 .profile-card p {
   color: var(--app-text) !important;
+}
+
+/* ── Profile section text colors ── */
+.profile-hero-card h4 {
+  color: #fff !important;
+  font-weight: 800;
+}
+
+.profile-hero-card p,
+.profile-hero-card .text-muted {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.profile-hero-card .dashboard-eyebrow {
+  color: #fff;
+}
+
+.profile-card h5 {
+  color: var(--app-accent) !important;
+  font-weight: 700;
+}
+
+.profile-card .form-label {
+  color: var(--app-text) !important;
+  font-weight: 600;
+}
+
+.profile-card p.text-muted,
+.profile-card .text-muted {
+  color: var(--app-muted) !important;
 }
 
 .chart-shell {
@@ -1053,5 +1085,81 @@ html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-w
 
   .theme-toggle-btn {
     min-width: auto;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Sidebar: Product submenu fix
+   ══════════════════════════════════════════════════════════ */
+.menu-vertical .menu-item .menu-sub {
+  display: none;
+  padding-left: 0;
+  list-style: none;
+}
+
+.menu-vertical .menu-item.active > .menu-sub,
+.menu-vertical .menu-item.open > .menu-sub {
+  display: block;
+}
+
+.menu-vertical .menu-sub .menu-link {
+  padding-left: 2.8rem !important;
+  min-height: 2.75rem;
+  font-size: 0.88rem;
+}
+
+.menu-vertical .menu-sub .menu-item.active > .menu-link {
+  color: var(--app-accent) !important;
+  font-weight: 600;
+}
+
+/* Menu toggle arrow indicator */
+.menu-toggle::after {
+  content: "";
+  display: inline-block;
+  width: 0.42em;
+  height: 0.42em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.25s ease;
+  margin-left: auto;
+}
+
+.menu-item.open > .menu-toggle::after,
+.menu-item.active > .menu-toggle::after {
+  transform: rotate(45deg);
+}
+
+@media (max-width: 1199.98px) {
+  .menu-vertical .menu-sub .menu-link {
+    padding-left: 2.5rem !important;
+    min-height: 42px;
+  }
+}
+
+/* ── Pagination mobile responsive ── */
+@media (max-width: 575.98px) {
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination-page-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .pagination-nav-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.2rem 0.4rem !important;
+  }
+
+  .datatable-pagination small {
+    width: 100%;
+    text-align: center;
   }
 }

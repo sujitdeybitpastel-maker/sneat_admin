@@ -1,3 +1,5 @@
+.env
+
 # System Files
 .DS_Store
 .AppleDouble
@@ -65,3 +67,5 @@ __pycache__/
 *.py[cod]
 instance/*.db
 instance/*.db-journal
+
+.claude

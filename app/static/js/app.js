@@ -10,7 +10,8 @@ const LOTTIE_LIBRARY = {
   eye: "https://assets10.lottiefiles.com/packages/lf20_4kx2q32n.json",
   "arrow-left": "https://assets10.lottiefiles.com/private_files/lf30_obidsi0t.json",
   edit: "https://assets4.lottiefiles.com/packages/lf20_wx4nmpm1.json",
-  toggle: "https://assets8.lottiefiles.com/packages/lf20_j1adxtyb.json"
+  toggle: "https://assets8.lottiefiles.com/packages/lf20_j1adxtyb.json",
+  bell: "https://assets2.lottiefiles.com/packages/lf20_bkmfzg3t.json"
 };
 
 const LINE_ICON_LIBRARY = {
@@ -79,6 +80,11 @@ const LINE_ICON_LIBRARY = {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
       <rect x="3.5" y="7.5" width="17" height="9" rx="4.5" />
       <circle cx="9" cy="12" r="3" />
+    </svg>`,
+  bell: `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </svg>`
 };
 
