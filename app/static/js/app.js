@@ -163,11 +163,11 @@ window.appUtils = {
   },
   formatDate(value) {
     if (!value) return "";
-    return new Intl.DateTimeFormat("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    }).format(new Date(value));
+    const d = new Date(value);
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   },
   enhanceDynamicUI(root = document) {
     initLottieIcons(root);

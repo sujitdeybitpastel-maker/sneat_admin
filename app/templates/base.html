@@ -16,7 +16,10 @@
     />
     <title>{% block title %}{{ app_name }}{% endblock %}</title>
     <meta name="description" content="Import export admin panel" />
-    <link rel="icon" type="image/x-icon" href="{{ asset_url('img/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16.png') }}" />
+    <link rel="apple-touch-icon" sizes="48x48" href="{{ url_for('static', filename='img/favicon-48.png') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -53,12 +56,21 @@
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
           <div class="app-brand demo">
             <a href="{{ url_for('dashboard.index') }}" class="app-brand-link">
-              <span class="app-brand-logo demo">
-                <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                  <path fill="#696cff" d="M13.7918663,0.358365126 L3.39788168,7.44174259 C0.566865006,9.69408886 -0.379795268,12.4788597 0.557900856,15.7960551 C0.68998853,16.2305145 1.09562888,17.7872135 3.12357076,19.2293357 C3.8146334,19.7207684 5.32369333,20.3834223 7.65075054,21.2172976 L7.59773219,21.2525164 L2.63468769,24.5493413 C0.445452254,26.3002124 0.0884951797,28.5083815 1.56381646,31.1738486 C2.83770406,32.8170431 5.20850219,33.2640127 7.09180128,32.5391577 C8.347334,32.0559211 11.4559176,30.0011079 16.4175519,26.3747182 C18.0338572,24.4997857 18.6973423,22.4544883 18.4080071,20.2388261 C17.963753,17.5346866 16.1776345,15.5799961 13.0496516,14.3747546 L10.9194936,13.4715819 L18.6192054,7.984237 L13.7918663,0.358365126 Z"></path>
+              <span class="app-brand-logo demo ss-logo-animated">
+                <svg width="36" height="36" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="ss-grad-side" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#0077B6"/>
+                      <stop offset="100%" style="stop-color:#00B4D8"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="ss-logo-ring" cx="24" cy="24" r="21" fill="none" stroke="url(#ss-grad-side)" stroke-width="2.5"/>
+                  <path class="ss-logo-wave" d="M8 28 C12 24, 16 32, 20 28 S28 24, 32 28 S38 32, 40 28" fill="none" stroke="#00B4D8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                  <path class="ss-logo-wave ss-logo-wave-2" d="M8 32 C12 28, 16 36, 20 32 S28 28, 32 32 S38 36, 40 32" fill="none" stroke="#0077B6" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+                  <text x="24" y="23" text-anchor="middle" dominant-baseline="central" font-family="Red Hat Display, sans-serif" font-weight="900" font-size="18" fill="url(#ss-grad-side)">SS</text>
                 </svg>
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2">SS Seafood</span>
             </a>
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
               <span class="lottie-icon" data-lottie="arrow-left" aria-hidden="true"></span>
@@ -127,7 +139,7 @@
               <div class="navbar-nav align-items-center d-none d-lg-flex">
                 <div class="nav-item d-flex align-items-center">
                   <span class="lottie-icon me-2" data-lottie="globe" aria-hidden="true"></span>
-                  <span class="ms-2 fw-semibold">Import Export Monitor</span>
+                  <span class="ms-2 fw-semibold">SS Seafood Admin</span>
                 </div>
               </div>
 

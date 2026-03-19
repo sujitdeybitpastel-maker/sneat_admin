@@ -47,4 +47,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _build_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REMEMBER_COOKIE_DURATION_DAYS = int(os.getenv("REMEMBER_COOKIE_DURATION_DAYS", "14"))
-    APP_NAME = os.getenv("APP_NAME", "Import Export Admin")
+    APP_NAME = os.getenv("APP_NAME", "SS Seafood")

@@ -1,3 +1,82 @@
+/* ── SS Seafood Logo Animation ── */
+.ss-logo-animated {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ss-logo-animated svg {
+  overflow: visible;
+}
+
+.ss-logo-ring {
+  stroke-dasharray: 132;
+  stroke-dashoffset: 132;
+  animation: ss-ring-draw 1.2s ease-out forwards;
+}
+
+.ss-logo-wave {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  animation: ss-wave-draw 1s ease-out 0.6s forwards, ss-wave-float 3s ease-in-out 1.6s infinite;
+}
+
+.ss-logo-wave-2 {
+  animation: ss-wave-draw 1s ease-out 0.8s forwards, ss-wave-float 3s ease-in-out 2s infinite reverse;
+}
+
+.ss-logo-animated text {
+  opacity: 0;
+  animation: ss-text-appear 0.5s ease-out 0.4s forwards;
+}
+
+.ss-logo-animated:hover .ss-logo-ring {
+  animation: ss-ring-pulse 0.8s ease-in-out;
+}
+
+.ss-logo-animated:hover .ss-logo-wave {
+  animation: ss-wave-float 1.5s ease-in-out infinite;
+  stroke-dashoffset: 0;
+}
+
+.ss-logo-animated:hover .ss-logo-wave-2 {
+  animation: ss-wave-float 1.5s ease-in-out 0.3s infinite reverse;
+  stroke-dashoffset: 0;
+}
+
+@keyframes ss-ring-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ss-wave-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ss-text-appear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ss-wave-float {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+@keyframes ss-ring-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* ── Brand text style ── */
+.app-brand-text.demo {
+  font-size: 1.15rem !important;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #0077B6, #00B4D8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ── Base utilities ── */
 .app-search {
   max-width: 280px;

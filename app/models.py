@@ -108,8 +108,8 @@ class User(UserMixin, TimestampMixin, db.Model):
             "role_label": self.role_label,
             "status": self.status,
             "status_label": self.status_label,
-            "created_at": self.created_at.strftime("%d %b %Y"),
-            "updated_at": self.updated_at.strftime("%d %b %Y") if self.updated_at else "-",
+            "created_at": self.created_at.strftime("%d-%m-%Y"),
+            "updated_at": self.updated_at.strftime("%d-%m-%Y") if self.updated_at else "-",
         }
 
 
@@ -186,8 +186,8 @@ class Product(TimestampMixin, db.Model):
             "origin_country": self.origin_country,
             "destination_country": self.destination_country,
             "status": self.resolved_status,
-            "created_at": self.created_at.strftime("%d %b %Y"),
-            "updated_at": self.updated_at.strftime("%d %b %Y") if self.updated_at else "-",
+            "created_at": self.created_at.strftime("%d-%m-%Y"),
+            "updated_at": self.updated_at.strftime("%d-%m-%Y") if self.updated_at else "-",
             "created_by": created_user.full_name if created_user else "-",
             "updated_by": updated_user.full_name if updated_user else "-",
         }
@@ -227,7 +227,7 @@ class ProductUpdate(TimestampMixin, db.Model):
             "changes": self.changes,
             "remarks": self.remarks,
             "updated_by": user.full_name if user else "-",
-            "created_at": self.created_at.strftime("%d %b %Y %H:%M"),
+            "created_at": self.created_at.strftime("%d-%m-%Y %H:%M"),
         }
 
 
@@ -248,5 +248,5 @@ class TradeRecord(TimestampMixin, db.Model):
             "record_type": self.record_type,
             "quantity": self.quantity,
             "amount": float(self.amount),
-            "recorded_on": self.recorded_on.strftime("%d %b %Y"),
+            "recorded_on": self.recorded_on.strftime("%d-%m-%Y"),
         }
