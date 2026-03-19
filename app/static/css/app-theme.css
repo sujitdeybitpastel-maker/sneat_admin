@@ -984,7 +984,7 @@ html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-w
   .dashboard-chart-card .card-header,
   .activity-card .card-header,
   .stat-card .card-body {
-    padding: var(--space-3);
+    padding: 1rem;
   }
 
   .dashboard-filter-head,
@@ -994,6 +994,64 @@ html[data-resolved-theme="light"] .dashboard-filter-panel input[type="date"]::-w
 
   .chart-shell,
   .chart-shell-compact {
-    min-height: 17rem;
+    min-height: 15rem;
+  }
+
+  .metric-card::before {
+    width: 9rem;
+    height: 9rem;
+    top: -3.5rem;
+    right: -2rem;
+  }
+
+  .metric-card::after {
+    width: 5rem;
+    height: 5rem;
+    bottom: -1.5rem;
+    left: -0.8rem;
+  }
+
+  .dashboard-hero::after {
+    width: 40%;
+    height: 140%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  :root {
+    --radius-md: 1rem;
+    --radius-lg: 1.2rem;
+  }
+
+  .card,
+  .modal-content,
+  .dropdown-menu,
+  .alert,
+  .form-control,
+  .form-select,
+  .input-group-text {
+    border-radius: 1rem;
+  }
+
+  .btn {
+    border-radius: 0.85rem;
+  }
+
+  .btn-sm {
+    border-radius: 0.7rem;
+  }
+
+  .metric-card,
+  .stat-card,
+  .profile-card,
+  .profile-hero-card,
+  .dashboard-chart-card,
+  .activity-card,
+  .dashboard-hero {
+    border-radius: 1.2rem !important;
+  }
+
+  .theme-toggle-btn {
+    min-width: auto;
   }
 }
