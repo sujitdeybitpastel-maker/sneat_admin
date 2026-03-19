@@ -14,6 +14,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard.index"))
 
+    login_error = None
+    identity = ""
+
     if request.method == "POST":
         identity = request.form.get("identity", "").strip()
         password = request.form.get("password", "")
@@ -24,14 +27,14 @@ def login():
         ).first()
 
         if not user or not user.check_password(password):
-            flash("Invalid username/email or password.", "danger")
+            login_error = "Invalid username/email or password."
         elif user.status != User.STATUS_ACTIVE:
-            flash("This account is inactive. Please contact the admin.", "warning")
+            login_error = "This account is inactive. Please contact the admin."
         else:
             login_user(user, remember=remember)
             return redirect(url_for("dashboard.index"))
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", login_error=login_error, identity=identity)
 
 
 @bp.route("/forgot-password", methods=["GET", "POST"])
