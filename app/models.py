@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import logging
+import re
 from datetime import date, datetime
 from typing import ClassVar
 
-import re
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
+
+logger = logging.getLogger(__name__)
 
 
 class TimestampMixin:
@@ -61,10 +64,13 @@ class User(UserMixin, TimestampMixin, db.Model):
     )
 
     def set_password(self, password: str) -> None:
+        logger.debug("User.set_password() | user_id=%s", self.id)
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password_hash, password)
+        result = check_password_hash(self.password_hash, password)
+        logger.debug("User.check_password() | user_id=%s | match=%s", self.id, result)
+        return result
 
     @property
     def is_active(self) -> bool:
@@ -86,10 +92,12 @@ class User(UserMixin, TimestampMixin, db.Model):
     def is_valid_email(cls, email: str) -> bool:
         pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(pattern, email):
+            logger.debug("User.is_valid_email() | Invalid format: %s", email)
             return False
 
         existing_user = cls.query.filter_by(email=email).first()
         if existing_user:
+            logger.debug("User.is_valid_email() | Email already exists: %s", email)
             return False
 
         return True
@@ -172,8 +180,8 @@ class Product(TimestampMixin, db.Model):
         return self.STATUS_CHOICES[self.STATUS_ACTIVE]
 
     def to_dict(self) -> dict:
-        created_user = User.query.get(self.created_by_id) if self.created_by_id else None
-        updated_user = User.query.get(self.updated_by_id) if self.updated_by_id else None
+        created_user = db.session.get(User, self.created_by_id) if self.created_by_id else None
+        updated_user = db.session.get(User, self.updated_by_id) if self.updated_by_id else None
         return {
             "id": self.id,
             "sku": self.sku,
@@ -210,8 +218,8 @@ class ProductUpdate(TimestampMixin, db.Model):
         return "Quantity Updated"
 
     def to_dict(self) -> dict:
-        user = User.query.get(self.updated_by_id) if self.updated_by_id else None
-        product = Product.query.get(self.product_id) if self.product_id else None
+        user = db.session.get(User, self.updated_by_id) if self.updated_by_id else None
+        product = db.session.get(Product, self.product_id) if self.product_id else None
         quantity_delta = 0
         if isinstance(self.changes, dict):
             quantity_delta = int(self.changes.get("quantity_delta", 0) or 0)
@@ -236,6 +244,7 @@ class TradeRecord(TimestampMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    product = db.relationship("Product", backref="trade_records", lazy=True)
     record_type = db.Column(db.String(20), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=0)
     amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)

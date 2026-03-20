@@ -39,13 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchData: async () => window.appUtils.json("/users/api"),
     renderRow: (row) => `
       <tr>
-        <td class="text-center"><input class="form-check-input user-row-checkbox" type="checkbox" data-id="${row.id}" ${selectedUserIds.has(String(row.id)) ? "checked" : ""} aria-label="Select user ${row.full_name}" /></td>
-        <td><strong>${row.full_name}</strong></td>
-        <td>${row.username}</td>
-        <td>${row.email}</td>
-        <td><span class="text-uppercase">${row.role_label}</span></td>
+        <td class="text-center"><input class="form-check-input user-row-checkbox" type="checkbox" data-id="${row.id}" ${selectedUserIds.has(String(row.id)) ? "checked" : ""} aria-label="Select user ${escapeHtml(row.full_name)}" /></td>
+        <td><strong>${escapeHtml(row.full_name)}</strong></td>
+        <td>${escapeHtml(row.username)}</td>
+        <td>${escapeHtml(row.email)}</td>
+        <td><span class="text-uppercase">${escapeHtml(row.role_label)}</span></td>
         <td>${window.appUtils.badge(row.status_label)}</td>
-        <td>${row.created_at}</td>
+        <td>${escapeHtml(row.created_at)}</td>
         <td>
           <button class="btn btn-sm btn-outline-primary me-1" data-action="edit" data-id="${row.id}">${window.appUtils.icon("edit", "me-1")}Edit</button>
           <button class="btn btn-sm btn-outline-secondary" data-action="toggle" data-id="${row.id}">${window.appUtils.icon("toggle", "me-1")}${row.status === "1" ? "Inactivate" : "Activate"}</button>

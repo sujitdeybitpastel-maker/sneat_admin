@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from calendar import monthrange
 from collections import defaultdict
 from datetime import date, datetime
@@ -9,13 +10,18 @@ from sqlalchemy import func
 
 from app.models import Product, TradeRecord, User
 
+logger = logging.getLogger(__name__)
+
 
 def _parse_date(value: str | None) -> date | None:
     if not value:
         return None
     try:
-        return datetime.strptime(value, "%Y-%m-%d").date()
+        parsed = datetime.strptime(value, "%Y-%m-%d").date()
+        logger.debug("_parse_date() | Parsed '%s' -> %s", value, parsed)
+        return parsed
     except ValueError:
+        logger.warning("_parse_date() | Invalid date format: '%s'", value)
         return None
 
 
@@ -36,10 +42,12 @@ def _month_labels(start_date: date, end_date: date) -> list[str]:
             cursor = date(cursor.year + 1, 1, 1)
         else:
             cursor = date(cursor.year, cursor.month + 1, 1)
+    logger.debug("_month_labels() | Generated %d labels from %s to %s", len(labels), start_date, end_date)
     return labels
 
 
 def _period_series(rows: list[TradeRecord], start_date: date, end_date: date) -> dict:
+    logger.debug("_period_series() | Processing %d records", len(rows))
     labels = _month_labels(start_date, end_date)
     monthly = {label: _zeroed_series() for label in labels}
 
@@ -57,6 +65,7 @@ def _period_series(rows: list[TradeRecord], start_date: date, end_date: date) ->
 
 
 def _comparison_series(end_date: date) -> dict:
+    logger.debug("_comparison_series() | Building comparison for end_date=%s", end_date)
     labels = []
     current = []
     previous = []
@@ -91,6 +100,7 @@ def _comparison_series(end_date: date) -> dict:
         current.append(float(current_total or Decimal("0")))
         previous.append(float(previous_total or Decimal("0")))
 
+    logger.debug("_comparison_series() | Built %d comparison data points", len(labels))
     return {
         "categories": labels,
         "current_period": current,
@@ -99,6 +109,8 @@ def _comparison_series(end_date: date) -> dict:
 
 
 def get_dashboard_payload(start_date_value: str | None = None, end_date_value: str | None = None) -> dict:
+    logger.info("get_dashboard_payload() | start=%s, end=%s", start_date_value, end_date_value)
+
     records_query = TradeRecord.query.order_by(TradeRecord.recorded_on.asc())
     all_dates = [row[0] for row in TradeRecord.query.with_entities(TradeRecord.recorded_on).all()]
     default_start = min(all_dates) if all_dates else date.today().replace(day=1)
@@ -108,10 +120,12 @@ def get_dashboard_payload(start_date_value: str | None = None, end_date_value: s
     end_date = _parse_date(end_date_value) or default_end
     if start_date > end_date:
         start_date, end_date = end_date, start_date
+        logger.warning("get_dashboard_payload() | start > end, swapped: start=%s, end=%s", start_date, end_date)
 
     filtered_records = (
         records_query.filter(TradeRecord.recorded_on >= start_date, TradeRecord.recorded_on <= end_date).all()
     )
+    logger.info("get_dashboard_payload() | Filtered %d trade records", len(filtered_records))
 
     totals = _zeroed_series()
     transaction_count = len(filtered_records)
@@ -128,6 +142,11 @@ def get_dashboard_payload(start_date_value: str | None = None, end_date_value: s
 
     total_trade = totals["imports"] + totals["exports"] + totals["sales"]
     average_ticket = total_trade / transaction_count if transaction_count else 0
+
+    logger.info(
+        "get_dashboard_payload() | Metrics: imports=%.2f, exports=%.2f, sales=%.2f, transactions=%d, markets=%d",
+        totals["imports"], totals["exports"], totals["sales"], transaction_count, len(markets),
+    )
 
     return {
         "metrics": {

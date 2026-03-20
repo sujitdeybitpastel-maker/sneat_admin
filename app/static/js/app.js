@@ -139,6 +139,18 @@ function initLottieIcons(root = document) {
   });
 }
 
+function escapeHtml(str) {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+window.escapeHtml = escapeHtml;
+
 window.appUtils = {
   currency(value) {
     return new Intl.NumberFormat("en-IN", {
@@ -155,7 +167,7 @@ window.appUtils = {
         : normalized === "inactive"
           ? "bg-label-secondary"
           : "bg-label-warning";
-    return `<span class="badge ${badgeClass} status-badge">${status}</span>`;
+    return `<span class="badge ${badgeClass} status-badge">${escapeHtml(status)}</span>`;
   },
   icon(name, extraClass = "") {
     const className = ["lottie-icon", extraClass].filter(Boolean).join(" ");

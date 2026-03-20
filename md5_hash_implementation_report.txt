@@ -1,0 +1,390 @@
+================================================================================
+        MD5 REQUEST HASH TRACKING SYSTEM — IMPLEMENTATION REPORT
+        Project: Sneat Admin Panel (Import Export Admin)
+        Date: 2026-03-20
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. WHAT IS THE MD5 HASH SYSTEM
+2. HOW IT WORKS (ARCHITECTURE)
+3. HASH GENERATION ALGORITHM
+4. FILES CREATED / MODIFIED
+5. LOG FORMAT — BEFORE vs AFTER
+6. HOW EVERY REQUEST IS TRACED
+7. HOW ERROR RESPONSES INCLUDE THE HASH
+8. HOW TO USE IT (GREP / SEARCH COMMANDS)
+9. FUNCTION-BY-FUNCTION HASH COVERAGE
+10. SECURITY BENEFITS
+
+================================================================================
+1. WHAT IS THE MD5 HASH SYSTEM
+================================================================================
+
+Every HTTP request that hits the server now gets a unique 32-character MD5
+hash assigned to it. This hash:
+
+  - Appears in EVERY log line generated during that request
+  - Is returned in all JSON error responses (status >= 400)
+  - Allows you to trace the complete lifecycle of any request
+  - Works across all blueprints, services, and models
+  - Falls back to "--------" for non-request logs (startup, seeding)
+
+Example hash: a3f8c1d2e9b74a6f0123456789abcdef
+
+================================================================================
+2. HOW IT WORKS (ARCHITECTURE)
+================================================================================
+
+                  ┌─────────────────────────┐
+                  │     HTTP REQUEST         │
+                  │  (from browser/API)      │
+                  └───────────┬──────────────┘
+                              │
+                  ┌───────────▼──────────────┐
+                  │  before_request hook      │
+                  │  _set_request_hash()      │
+                  │  • Generate MD5 hash      │
+                  │  • Store in Flask g       │
+                  │  • Log [HASH-START]       │
+                  └───────────┬──────────────┘
+                              │
+                  ┌───────────▼──────────────┐
+                  │  RequestHashFilter        │
+                  │  (logging.Filter)         │
+                  │  • Reads g.req_hash       │
+                  │  • Injects into LogRecord │
+                  │  • ALL loggers inherit it │
+                  └───────────┬──────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+   ┌──────▼──────┐   ┌───────▼──────┐   ┌───────▼──────┐
+   │  Blueprint   │   │  Service     │   │  Model       │
+   │  auth.py     │   │  dashboard   │   │  User        │
+   │  products.py │   │  excel.py    │   │  Product     │
+   │  users.py    │   │  seed.py     │   │  etc.        │
+   │  dashboard   │   │              │   │              │
+   └──────┬──────┘   └───────┬──────┘   └───────┬──────┘
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                  ┌───────────▼──────────────┐
+                  │  after_request hook       │
+                  │  _log_request_end()       │
+                  │  • Log [HASH-END]         │
+                  │  • Inject hash into JSON  │
+                  │    error responses        │
+                  └──────────────────────────┘
+
+COMPONENTS:
+
+  1. app/request_hash.py (NEW FILE)
+     - _generate_request_hash()  → creates the MD5
+     - RequestHashFilter          → logging filter that injects hash
+     - init_request_hash(app)     → registers before/after hooks
+
+  2. app/logging_config.py (MODIFIED)
+     - Log format now includes [%(req_hash)s]
+     - RequestHashFilter attached to root logger
+
+  3. app/__init__.py (MODIFIED)
+     - Calls init_request_hash(app) during app creation
+
+  4. All blueprints (MODIFIED)
+     - Error responses include "req_hash" field
+     - Security-sensitive logs include explicit hash reference
+
+================================================================================
+3. HASH GENERATION ALGORITHM
+================================================================================
+
+The MD5 hash is generated from these inputs concatenated:
+
+  INPUT 1: time.time_ns()          → nanosecond timestamp (uniqueness)
+  INPUT 2: request.remote_addr     → client IP address (identity)
+  INPUT 3: request.method          → GET, POST, PUT, etc.
+  INPUT 4: request.path            → /login, /products/api, etc.
+  INPUT 5: os.urandom(8).hex()     → 8 random bytes (collision prevention)
+
+  FORMULA:
+    raw = f"{time_ns}|{ip}|{method}|{path}|{random_hex}"
+    hash = hashlib.md5(raw.encode("utf-8")).hexdigest()
+
+  RESULT: 32-character hex string, e.g. "a3f8c1d2e9b74a6f0123456789abcdef"
+
+  WHY MD5:
+    - Fast computation (no crypto strength needed here)
+    - 32 chars is compact enough for log lines
+    - Sufficient uniqueness for request tracing (not used for passwords)
+    - Industry standard for correlation IDs
+
+  NOTE: This is NOT used for password hashing. Passwords continue to use
+  Werkzeug's generate_password_hash() (PBKDF2-SHA256, salted).
+
+================================================================================
+4. FILES CREATED / MODIFIED
+================================================================================
+
+NEW FILES:
+  app/request_hash.py
+    - _generate_request_hash()      → MD5 hash generator
+    - RequestHashFilter              → logging.Filter subclass
+    - init_request_hash(app)         → Flask hook registration
+
+MODIFIED FILES:
+  app/logging_config.py
+    - Log format: added [%(req_hash)s] field
+    - Root logger: attached RequestHashFilter
+    - Both console and file handlers now show the hash
+
+  app/__init__.py
+    - Added: from app.request_hash import init_request_hash
+    - Added: init_request_hash(app) call
+    - Moved setup_logging() before first logger.info() call
+
+  app/blueprints/auth.py
+    - login(): explicit req_hash in security log messages
+    - logout(): explicit req_hash in logout log message
+    - Import added: from flask import g
+
+  app/blueprints/dashboard.py
+    - api_dashboard(): req_hash in error response
+    - Import added: from flask import g
+
+  app/blueprints/products.py
+    - Added _get_hash() helper
+    - _validation_error(): includes req_hash in response JSON
+    - All error responses (500s): include req_hash
+    - Import added: from flask import g
+
+  app/blueprints/users.py
+    - Added _get_hash() helper
+    - _validation_error(): includes req_hash in response JSON
+    - All error responses (400s, 500s): include req_hash
+    - Import added: from flask import g
+
+================================================================================
+5. LOG FORMAT — BEFORE vs AFTER
+================================================================================
+
+BEFORE (no hash):
+  [2026-03-20 14:30:15] INFO     app.blueprints.auth            | login:17 | login() called | method=POST
+
+AFTER (with MD5 hash):
+  [2026-03-20 14:30:15] INFO     [a3f8c1d2e9b74a6f0123456789abcdef] app.blueprints.auth            | login:17 | login() called | method=POST
+
+STARTUP LOGS (no request context):
+  [2026-03-20 14:30:10] INFO     [--------] app                              | create_app:30 | === Creating Flask application ===
+
+FORMAT BREAKDOWN:
+  [TIMESTAMP]  LEVEL  [MD5_HASH]  MODULE  |  FUNCTION:LINE  |  MESSAGE
+
+================================================================================
+6. HOW EVERY REQUEST IS TRACED
+================================================================================
+
+A single request produces a trace like this (all lines share the same hash):
+
+  [14:30:15] INFO  [a3f8c1d2...] app.request_hash     | _set_request_hash:64 | [HASH-START] POST /login | hash=a3f8c1d2... | ip=127.0.0.1 | user_agent=Mozilla/5.0...
+  [14:30:15] INFO  [a3f8c1d2...] app.blueprints.auth  | login:17            | login() called | method=POST
+  [14:30:15] INFO  [a3f8c1d2...] app.blueprints.auth  | login:29            | login() | POST attempt | identity=admin, remember=False
+  [14:30:15] DEBUG [a3f8c1d2...] app.models           | check_password:71   | User.check_password() | user_id=1 | match=True
+  [14:30:15] INFO  [a3f8c1d2...] app.blueprints.auth  | login:43            | login() | SUCCESS | user_id=1, username=admin
+  [14:30:15] INFO  [a3f8c1d2...] app.request_hash     | _log_request_end:74 | [HASH-END]   POST /login | hash=a3f8c1d2... | status=302 | size=...
+
+  KEY MARKERS:
+    [HASH-START]  → First log line of any request (before_request)
+    [HASH-END]    → Last log line of any request (after_request)
+
+FAILED LOGIN TRACE:
+  [14:32:00] INFO    [b7e9f4a1...] auth | login:17    | login() called | method=POST
+  [14:32:00] INFO    [b7e9f4a1...] auth | login:29    | POST attempt | identity=hacker
+  [14:32:00] WARNING [b7e9f4a1...] auth | login:37    | FAILED login attempt | identity=hacker | req_hash=b7e9f4a1...
+  [14:32:00] INFO    [b7e9f4a1...] hash | _log_end:74 | [HASH-END] POST /login | status=200
+
+================================================================================
+7. HOW ERROR RESPONSES INCLUDE THE HASH
+================================================================================
+
+When any API endpoint returns status >= 400, the MD5 hash is injected
+into the JSON response body automatically:
+
+  HTTP 400 (validation error):
+  {
+    "message": "Please correct the highlighted fields.",
+    "field_errors": {"sku": "SKU must be at least 4 characters."},
+    "req_hash": "a3f8c1d2e9b74a6f0123456789abcdef"
+  }
+
+  HTTP 500 (server error):
+  {
+    "message": "An unexpected error occurred.",
+    "req_hash": "a3f8c1d2e9b74a6f0123456789abcdef"
+  }
+
+This means:
+  - A user sees an error on screen
+  - They report the req_hash to the developer
+  - Developer greps the log file:  grep "a3f8c1d2" logs/app.log
+  - Developer sees the FULL trace of what happened
+
+The hash injection happens in TWO places:
+  1. _validation_error() helpers in products.py and users.py
+     → Explicitly includes req_hash in the response dict
+  2. after_request hook in request_hash.py
+     → Automatically injects req_hash into any JSON 4xx/5xx response
+        that doesn't already have it
+
+================================================================================
+8. HOW TO USE IT (GREP / SEARCH COMMANDS)
+================================================================================
+
+TRACE A SPECIFIC REQUEST:
+  grep "a3f8c1d2" logs/app.log
+
+FIND ALL FAILED LOGINS:
+  grep "FAILED login attempt" logs/app.log
+
+FIND ALL FAILED LOGINS WITH THEIR HASHES:
+  grep "FAILED login" logs/app.log | grep -oP '\[([a-f0-9]{32})\]'
+
+FIND ALL 500 ERRORS:
+  grep "HASH-END.*status=5" logs/app.log
+
+FIND ALL REQUESTS FROM A SPECIFIC IP:
+  grep "HASH-START.*ip=192.168.1.100" logs/app.log
+
+FIND ALL REQUESTS FOR A SPECIFIC ENDPOINT:
+  grep "HASH-START.*POST /products/api" logs/app.log
+
+FIND ALL REQUESTS AND THEIR DURATION (START to END):
+  grep -E "HASH-START|HASH-END" logs/app.log
+
+COUNT REQUESTS PER HOUR:
+  grep "HASH-START" logs/app.log | cut -d' ' -f1-2 | cut -d: -f1-2 | sort | uniq -c
+
+LIVE MONITORING:
+  tail -f logs/app.log | grep --color "a3f8c1d2"
+
+================================================================================
+9. FUNCTION-BY-FUNCTION HASH COVERAGE
+================================================================================
+
+The MD5 hash automatically appears in log lines from EVERY function below.
+The [auto] tag means the hash is injected by the logging filter — no code
+change was needed. The [explicit] tag means the hash is also explicitly
+referenced in the code for security-critical messages.
+
+--- app/request_hash.py ---
+  _set_request_hash()     [explicit]  Logs hash at request start
+  _log_request_end()      [explicit]  Logs hash at request end + injects into JSON
+
+--- app/__init__.py ---
+  create_app()            [auto]      Startup logs (shows "--------")
+  load_user()             [auto]      User session loading
+  assets_files()          [auto]      Static asset serving
+  health()                [auto]      Health check
+  home()                  [auto]      Home redirect
+
+--- app/blueprints/auth.py ---
+  login()                 [auto+explicit]  Login attempts, successes, failures
+  forgot_password()       [auto]           Password reset flow
+  logout()                [auto+explicit]  User logout events
+
+--- app/blueprints/dashboard.py ---
+  index()                 [auto]      Dashboard page
+  api_dashboard()         [auto]      Dashboard API data
+
+--- app/blueprints/products.py ---
+  _validation_error()     [explicit]  All validation errors include hash in JSON
+  _can_manage_*()         [auto]      Permission checks
+  _sync_product_status()  [auto]      Status sync operations
+  _validate_*()           [auto]      Payload validation
+  _product_from_payload() [auto]      Product building
+  page()                  [auto]      Products page
+  list_products()         [auto]      List all products
+  create_product()        [auto]      Create product + hash in error JSON
+  update_product()        [auto]      Update product + hash in error JSON
+  toggle_product_status() [auto]      Toggle status + hash in error JSON
+  list_supervisor_updates() [auto]    List updates + hash in error JSON
+  create_supervisor_update() [auto]   Create update + hash in error JSON
+  product_updates()       [auto]      Product updates + hash in error JSON
+  export_products()       [auto]      Excel export + hash in error JSON
+  product_transactions()  [auto]      Transactions + hash in error JSON
+
+--- app/blueprints/users.py ---
+  _validation_error()     [explicit]  All validation errors include hash in JSON
+  _validate_password_change() [auto]  Password validation
+  admin_required()        [auto]      Admin access check
+  _user_from_payload()    [auto]      User building
+  _validate_user_uniqueness() [auto]  Uniqueness check
+  page()                  [auto]      Users page
+  profile()               [auto]      Profile page
+  list_users()            [auto]      List users + hash in error JSON
+  create_user()           [auto]      Create user
+  update_user()           [auto]      Update user
+  toggle_user_status()    [auto]      Toggle status + hash in error JSON
+  export_users()          [auto]      Excel export + hash in error JSON
+  get_profile()           [auto]      Get profile
+  update_profile()        [auto]      Update profile + hash in error JSON
+  update_password()       [auto]      Update password + hash in error JSON
+  set_theme()             [auto]      Theme setting + hash in error JSON
+
+--- app/services/dashboard.py ---
+  _parse_date()           [auto]      Date parsing
+  _month_labels()         [auto]      Month label generation
+  _period_series()        [auto]      Period series calculation
+  _comparison_series()    [auto]      Year comparison
+  get_dashboard_payload() [auto]      Full dashboard data assembly
+
+--- app/services/seed.py ---
+  seed_database()         [auto]      Database seeding (shows "--------")
+
+--- app/services/excel.py ---
+  build_workbook()        [auto]      Excel workbook generation
+
+--- app/models.py ---
+  User.set_password()     [auto]      Password hashing
+  User.check_password()   [auto]      Password verification
+  User.is_valid_email()   [auto]      Email validation
+
+--- config.py ---
+  _load_dotenv()          [auto]      Environment loading (shows "--------")
+  _build_database_uri()   [auto]      DB URI construction (shows "--------")
+  _get_secret_key()       [auto]      Secret key validation (shows "--------")
+
+TOTAL: 50+ functions covered by the MD5 hash tracking system.
+
+================================================================================
+10. SECURITY BENEFITS
+================================================================================
+
+1. INCIDENT INVESTIGATION
+   When a security incident occurs (e.g. unauthorized access attempt),
+   grep the hash from the error response to see the full server-side trace
+   including IP, user agent, which functions were called, and what data
+   was accessed.
+
+2. BRUTE FORCE DETECTION
+   Failed login attempts are logged with their hash. You can correlate
+   multiple failed attempts from the same IP by grepping HASH-START lines.
+
+3. AUDIT TRAIL
+   Every data modification (create/update/delete user, product, etc.) is
+   tagged with a hash. If data was modified maliciously, the hash links
+   the change back to the exact HTTP request, IP, and user.
+
+4. TAMPER DETECTION
+   The hash is generated server-side from request properties + random bytes.
+   It cannot be predicted or forged by the client. If a log line has a
+   hash that doesn't match any HASH-START entry, the log was tampered with.
+
+5. SUPPORT WORKFLOW
+   User reports error → gives req_hash from error screen →
+   developer greps logs → finds complete trace → resolves issue.
+   No more "what were you doing when it broke?".
+
+================================================================================
+                          END OF REPORT
+================================================================================

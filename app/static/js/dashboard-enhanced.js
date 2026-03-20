@@ -151,12 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
         (row) => `
         <div class="activity-row">
           <div>
-            <h6 class="mb-1">${row.product}</h6>
-            <small class="text-muted">${row.type} • Qty ${row.quantity}</small>
+            <h6 class="mb-1">${escapeHtml(row.product)}</h6>
+            <small class="text-muted">${escapeHtml(row.type)} • Qty ${escapeHtml(row.quantity)}</small>
           </div>
           <div class="text-end">
             <strong>${window.appUtils.currency(row.amount)}</strong>
-            <small class="text-muted d-block">${row.date}</small>
+            <small class="text-muted d-block">${escapeHtml(row.date)}</small>
           </div>
         </div>`
       )

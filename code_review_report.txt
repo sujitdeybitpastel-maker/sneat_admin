@@ -1,0 +1,341 @@
+================================================================================
+       CODE REVIEW, LOGGING & VULNERABILITY FIX REPORT
+       Project: Sneat Admin Panel (Import Export Admin)
+       Date: 2026-03-20
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. OVERVIEW
+2. LOGGING ADDED (FUNCTION-BY-FUNCTION TRACE)
+3. VULNERABILITIES FOUND & FIXED
+4. BROWSER CONSOLE ERRORS REMOVED
+5. PRINT STATEMENTS REMOVED
+6. FILES MODIFIED
+7. HOW TO READ LOGS IN TERMINAL
+
+================================================================================
+1. OVERVIEW
+================================================================================
+
+Total Python files modified:  10
+Total JS files modified:       5
+New files created:             1  (app/logging_config.py)
+Vulnerabilities fixed:        12
+Logger added to functions:    50+
+Print statements removed:     2
+Browser alert/console leaks:  Fixed (XSS via innerHTML)
+
+================================================================================
+2. LOGGING ADDED - FUNCTION-BY-FUNCTION TRACE
+================================================================================
+
+Each function now logs entry, key parameters, success/failure, and exit.
+Log format: [TIMESTAMP] LEVEL MODULE | function:line | message
+
+--- app/__init__.py ---
+  create_app()          -> INFO:  "=== Creating Flask application ==="
+                        -> INFO:  "App config loaded | instance_path=..."
+                        -> INFO:  "Extensions initialized (db, login_manager)"
+                        -> INFO:  "All blueprints registered"
+                        -> INFO:  "Database tables created/verified"
+                        -> INFO:  "=== Flask application created successfully ==="
+  load_user()           -> DEBUG: "load_user called | user_id=..."
+
+--- app/blueprints/auth.py ---
+  login()               -> INFO:  "login() called | method=GET/POST"
+                        -> INFO:  "login() | POST attempt | identity=..., remember=..."
+                        -> WARNING: "login() | FAILED login attempt | identity=..."
+                        -> WARNING: "login() | Inactive account | identity=..., user_id=..."
+                        -> INFO:  "login() | SUCCESS | user_id=..., username=..."
+  forgot_password()     -> INFO:  "forgot_password() called | method=..."
+                        -> INFO:  "forgot_password() | POST - password reset flow triggered"
+  logout()              -> INFO:  "logout() | User logged out | user_id=..., username=..."
+
+--- app/blueprints/dashboard.py ---
+  index()               -> INFO:  "index() | Dashboard page requested"
+  api_dashboard()       -> INFO:  "api_dashboard() | Fetching dashboard data | start_date=..., end_date=..."
+                        -> INFO:  "api_dashboard() | Dashboard data built successfully"
+                        -> EXCEPTION: "api_dashboard() | ERROR building dashboard payload"
+
+--- app/blueprints/products.py ---
+  _validation_error()   -> WARNING: "Validation error | message=... | field_errors=..."
+  _can_manage_main_products() -> DEBUG: "user_id=..., role=..., result=..."
+  _can_manage_product_updates() -> DEBUG: "user_id=..., role=..., result=..."
+  _sync_product_status()-> DEBUG: "product_id=... | effective_qty=... | status: old -> new"
+  _validate_product_payload() -> DEBUG/WARNING: validation results
+  _product_from_payload()-> DEBUG: "Built product | sku=..., name=..., is_new=..."
+  _selected_ids()       -> DEBUG: "parsed ids=..."
+  page()                -> INFO:  "Products page requested | section=..."
+  list_products()       -> INFO:  "Listing all products" / "Returned N products"
+  create_product()      -> INFO:  "Creating new product | user_id=..."
+                        -> INFO:  "SUCCESS | product_id=..., sku=..."
+                        -> WARNING: "IntegrityError | sku=..."
+                        -> EXCEPTION: "Unexpected error"
+  update_product()      -> INFO:  "Updating product_id=... | user_id=..."
+                        -> INFO:  "SUCCESS | product_id=..., sku=..."
+  toggle_product_status()-> INFO: "product_id=... | status: old -> new"
+  list_supervisor_updates() -> INFO: "Returned N updates"
+  create_supervisor_update() -> INFO: "product_id=... | base_qty=... | change=... | next_effective=..."
+                        -> INFO:  "SUCCESS | update_id=..., product_id=..."
+  product_updates()     -> INFO:  "product_id=... | found N updates"
+  export_products()     -> INFO:  "selected_ids=..." / "SUCCESS | products=N, audits=N"
+  product_transactions()-> INFO:  "product_id=... | found N transactions"
+
+--- app/blueprints/users.py ---
+  _validation_error()   -> WARNING: "Validation error | message=..."
+  _validate_password_change() -> DEBUG/WARNING: validation results
+  admin_required()      -> WARNING: "Access denied | user_id=..., role=..., endpoint=..."
+  _user_from_payload()  -> DEBUG: "Built user | username=..., email=..."
+  _validate_user_uniqueness() -> DEBUG/WARNING: uniqueness check results
+  _selected_ids()       -> DEBUG: "parsed ids=..."
+  page()                -> INFO:  "Users page requested | user_id=..."
+  profile()             -> INFO:  "Profile page requested | user_id=..."
+  list_users()          -> INFO:  "search=... | Returned N users"
+  create_user()         -> INFO:  "Creating new user | admin_id=..."
+                        -> INFO:  "SUCCESS | user_id=..., username=..."
+  update_user()         -> INFO:  "user_id=... | admin_id=..." / "SUCCESS"
+  toggle_user_status()  -> INFO:  "user_id=... | status: old -> new"
+  export_users()        -> INFO:  "exported N users"
+  get_profile()         -> INFO:  "user_id=..."
+  update_profile()      -> INFO:  "SUCCESS | user_id=..."
+  update_password()     -> INFO:  "SUCCESS | user_id=..."
+  set_theme()           -> INFO:  "SUCCESS | theme_mode=..."
+
+--- app/services/dashboard.py ---
+  _parse_date()         -> DEBUG: "Parsed 'value' -> date" / WARNING: "Invalid date format"
+  _month_labels()       -> DEBUG: "Generated N labels from start to end"
+  _period_series()      -> DEBUG: "Processing N records"
+  _comparison_series()  -> DEBUG: "Building comparison for end_date=..."
+  get_dashboard_payload() -> INFO: "start=..., end=..." / "Filtered N trade records"
+                        -> INFO:  "Metrics: imports=..., exports=..., sales=..., transactions=..."
+
+--- app/services/seed.py ---
+  seed_database()       -> INFO:  "Checking if seeding is needed"
+                        -> INFO:  "Database already seeded, skipping" (OR)
+                        -> INFO:  "No users found, seeding database with initial data"
+                        -> INFO:  "Created admin/operator/supervisor/manager user"
+                        -> INFO:  "N products created and flushed"
+                        -> INFO:  "Seeding COMPLETE | N users, N products, N trades"
+
+--- app/services/excel.py ---
+  build_workbook()      -> INFO:  "Building workbook with N sheets: [names]"
+                        -> DEBUG: "Sheet 'name' written with N rows"
+                        -> INFO:  "Workbook built successfully | size=N bytes"
+
+--- app/models.py ---
+  User.set_password()   -> DEBUG: "user_id=..."
+  User.check_password() -> DEBUG: "user_id=... | match=True/False"
+  User.is_valid_email() -> DEBUG: "Invalid format" / "Email already exists"
+
+--- config.py ---
+  _load_dotenv()        -> INFO:  "Loading environment from .env"
+  _build_database_uri() -> INFO:  "Using DATABASE_URL" / "Built URI from POSTGRES_*" / "Falling back to SQLite"
+  _get_secret_key()     -> WARNING: "SECRET_KEY is weak or missing!"
+
+--- run.py ---
+  __main__              -> INFO:  "Starting development server on port 5000"
+
+--- wsgi.py ---
+  module load           -> INFO:  "WSGI entry point loaded"
+
+================================================================================
+3. VULNERABILITIES FOUND & FIXED
+================================================================================
+
+VULN-01: WEAK SECRET_KEY (SEVERITY: CRITICAL)
+  File: config.py:46
+  Before: SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
+  Issue:  Hardcoded fallback secret key. If SECRET_KEY env var is missing,
+          sessions can be forged by any attacker.
+  Fix:    Added _get_secret_key() that generates a random 64-char hex token
+          when the key is weak/missing, and logs a WARNING to the terminal.
+
+VULN-02: EXPOSED DATABASE CREDENTIALS IN .env COMMENTS (SEVERITY: HIGH)
+  File: .env
+  Before: Comments contained full production database URLs with passwords:
+          postgresql://sneat_admin_tiiz_user:GXq7kwQ1vICKbSRdwGjyLzbq1X2Tp6KQ@...
+          PGPASSWORD=GXq7kwQ1vICKbSRdwGjyLzbq1X2Tp6KQ psql -h ...
+  Fix:    Removed all commented-out production credentials from .env.
+          These credentials were visible to anyone with repo access.
+
+VULN-03: XSS VIA innerHTML (SEVERITY: HIGH)
+  Files: dashboard.js, dashboard-enhanced.js, products.js, users.js, app.js
+  Before: User-controlled data (product names, usernames, emails, remarks, etc.)
+          was injected directly into innerHTML without escaping.
+          Example: `<h6>${row.product}</h6>` - if product name contains
+          `<script>alert(1)</script>`, it executes.
+  Fix:    Added escapeHtml() utility function in app.js. All dynamic data
+          injected via innerHTML is now escaped through escapeHtml().
+          Applied to: product names, SKUs, categories, countries, usernames,
+          emails, full names, remarks, dates, quantities, status labels,
+          dropdown options, and activity feed data.
+
+VULN-04: BARE EXCEPT WITHOUT RESPONSE (SEVERITY: MEDIUM)
+  File: products.py:137-138 (old)
+  Before: `except Exception: logger.exception("Error in Create Product data:")`
+          No response returned - Flask returns None, causing a 500 with no body.
+  Fix:    Added `db.session.rollback()` and proper JSON error response with
+          status code 500 for all exception handlers.
+
+VULN-05: MISSING ERROR HANDLING ON MULTIPLE ENDPOINTS (SEVERITY: MEDIUM)
+  Files: products.py, users.py, dashboard.py
+  Before: Many endpoints had no try/except - database errors or unexpected
+          exceptions would show raw tracebacks.
+  Fix:    Added try/except with proper logging and JSON error responses to:
+          - list_products(), update_product(), toggle_product_status()
+          - list_supervisor_updates(), create_supervisor_update()
+          - product_updates(), export_products(), product_transactions()
+          - api_dashboard()
+          - list_users(), toggle_user_status(), export_users()
+          - update_profile(), update_password()
+
+VULN-06: DEPRECATED User.query.get() (SEVERITY: LOW)
+  File: models.py, app/__init__.py
+  Before: User.query.get(id), Product.query.get(id) - deprecated in
+          SQLAlchemy 2.0, scheduled for removal.
+  Fix:    Replaced with db.session.get(User, id), db.session.get(Product, id)
+          throughout models.py (to_dict methods) and load_user().
+
+VULN-07: MISSING INPUT VALIDATION IN update_profile() (SEVERITY: MEDIUM)
+  File: users.py (update_profile endpoint)
+  Before: payload["full_name"], payload["username"], payload["email"] accessed
+          directly with bracket notation - raises KeyError if missing, causing
+          unhandled 500 error.
+  Fix:    Changed to payload.get() with empty string defaults and added
+          explicit validation that all fields are present before processing.
+
+VULN-08: MISSING INPUT VALIDATION IN _user_from_payload() (SEVERITY: MEDIUM)
+  File: users.py (_user_from_payload function)
+  Before: payload["full_name"], payload["username"], etc. accessed directly
+          with bracket notation - raises KeyError if fields are missing.
+  Fix:    Changed to payload.get() with empty string defaults and added
+          explicit validation with proper error messages.
+
+VULN-09: MISSING db.session.rollback() ON EXCEPTIONS (SEVERITY: MEDIUM)
+  Files: products.py, users.py
+  Before: When unexpected exceptions occurred, the database session was left
+          in a dirty state, potentially causing subsequent operations to fail.
+  Fix:    Added db.session.rollback() in all except blocks before returning
+          error responses.
+
+VULN-10: TradeRecord MISSING RELATIONSHIP (SEVERITY: LOW)
+  File: models.py
+  Before: TradeRecord accessed product via Product.query.get() in dashboard
+          service (trade.product), but no SQLAlchemy relationship was defined.
+          This caused implicit N+1 queries.
+  Fix:    Added explicit db.relationship("Product", backref="trade_records")
+          to TradeRecord model.
+
+VULN-11: PRINT STATEMENTS LEAKING TO STDOUT (SEVERITY: LOW)
+  File: products.py:204, 229 (old)
+  Before: print("Received supervisor update payload:", payload)
+          print(f"Calculated next effective quantity: ...")
+  Issue:  Raw print() bypasses log rotation, formatting, and level filtering.
+  Fix:    Replaced with logger.debug() and logger.info() calls.
+
+VULN-12: LOG DIRECTORY NOT IN .gitignore (SEVERITY: LOW)
+  File: .gitignore
+  Fix:    Added `logs/` to .gitignore to prevent log files from being
+          committed to version control.
+
+================================================================================
+4. BROWSER CONSOLE ERRORS REMOVED
+================================================================================
+
+- All error messages now go to server terminal logs, NOT browser console.
+- API error responses return clean JSON: {"message": "...", "field_errors": {...}}
+- No stack traces or internal details are exposed to the client.
+- The `alert()` calls in JS remain for user-facing feedback (form success/error
+  notifications) as they are intentional UX, not error leaks. They show only
+  sanitized server messages, never raw errors.
+
+================================================================================
+5. PRINT STATEMENTS REMOVED
+================================================================================
+
+File: app/blueprints/products.py (old version)
+  Line 204: print("Received supervisor update payload:", payload)
+  Line 229: print(f"Calculated next effective quantity: {next_effective_quantity}...")
+
+Both replaced with proper logger calls (logger.debug / logger.info).
+
+================================================================================
+6. FILES MODIFIED
+================================================================================
+
+NEW FILES:
+  app/logging_config.py          - Centralized logging configuration
+
+MODIFIED FILES:
+  config.py                      - Added secure SECRET_KEY generation, logging
+  run.py                         - Added logging import and startup log
+  wsgi.py                        - Added logging import and entry log
+  app/__init__.py                - Added logging to create_app(), load_user(),
+                                   all routes; fixed deprecated query.get()
+  app/models.py                  - Added logging to User methods; fixed
+                                   deprecated query.get() -> db.session.get();
+                                   added TradeRecord.product relationship
+  app/extensions.py              - (unchanged)
+  app/blueprints/auth.py         - Added comprehensive logging to login(),
+                                   forgot_password(), logout()
+  app/blueprints/dashboard.py    - Added logging and error handling to
+                                   api_dashboard()
+  app/blueprints/products.py     - Added logging to ALL 12 functions;
+                                   removed print() statements; added error
+                                   handling with proper responses; fixed bare
+                                   except returning None
+  app/blueprints/users.py        - Added logging to ALL 15 functions; added
+                                   error handling; fixed unsafe dict access;
+                                   added input validation to update_profile()
+  app/services/dashboard.py      - Added logging to all 6 functions
+  app/services/seed.py           - Added step-by-step logging for seed process
+  app/services/excel.py          - Added logging to build_workbook()
+  app/static/js/app.js           - Added escapeHtml() utility; escaped badge()
+  app/static/js/dashboard.js     - Escaped dynamic HTML in activity feed
+  app/static/js/dashboard-enhanced.js - Escaped dynamic HTML in activity feed
+  app/static/js/products.js      - Escaped all dynamic HTML (table rows,
+                                   supervisor table, updates modal, dropdown)
+  app/static/js/users.js         - Escaped all dynamic HTML in user table rows
+  .env                           - Removed exposed production credentials
+  .gitignore                     - Added logs/ directory
+
+================================================================================
+7. HOW TO READ LOGS IN TERMINAL
+================================================================================
+
+LOG OUTPUT LOCATIONS:
+  1. Terminal (stdout) - All logs appear in your terminal when running the app
+  2. File: logs/app.log - Persistent log file (auto-created on first run)
+
+LOG FORMAT:
+  [2026-03-20 14:30:15] INFO     app.blueprints.auth            | login:12 | login() called | method=POST
+
+LOG LEVELS (from most to least verbose):
+  DEBUG    - Detailed internal state (function params, query results)
+  INFO     - Normal operations (requests, successes, data counts)
+  WARNING  - Suspicious activity (failed logins, validation errors, weak config)
+  ERROR    - Operation failures (caught exceptions)
+  CRITICAL - System-level failures
+
+TRACKING A REQUEST (example - user creates a product):
+  [14:30:15] INFO  products  | create_product:115 | Creating new product | user_id=1
+  [14:30:15] DEBUG products  | _can_manage_main_products:28  | user_id=1, role=2, result=True
+  [14:30:15] DEBUG products  | _validate_product_payload:39  | validating payload keys=[sku, name, ...]
+  [14:30:15] DEBUG products  | _validate_product_payload:68  | Validation passed
+  [14:30:15] DEBUG products  | _product_from_payload:75      | Built product | sku=IMP-1001, is_new=True
+  [14:30:15] DEBUG products  | _sync_product_status:34       | product_id=None | effective_qty=240 | status: None -> 1
+  [14:30:15] INFO  products  | create_product:131            | SUCCESS | product_id=4, sku=IMP-1001
+
+TRACKING FAILED LOGIN:
+  [14:32:00] INFO    auth | login:12     | login() called | method=POST
+  [14:32:00] INFO    auth | login:22     | POST attempt | identity=admin, remember=False
+  [14:32:00] WARNING auth | login:31     | FAILED login attempt | identity=admin
+
+TO CHANGE LOG LEVEL:
+  Edit app/logging_config.py -> setup_logging(log_level="DEBUG")
+  Or set LOG_LEVEL environment variable.
+
+================================================================================
+                          END OF REPORT
+================================================================================

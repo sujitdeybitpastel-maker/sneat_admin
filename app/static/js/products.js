@@ -56,21 +56,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return `
         <tr>
-          <td class="text-center"><input class="form-check-input product-row-checkbox" type="checkbox" data-id="${row.id}" ${selectedProductIds.has(String(row.id)) ? "checked" : ""} aria-label="Select product ${row.name}" /></td>
-          <td>${row.sku}</td>
-          <td><strong>${row.name}</strong></td>
-          <td>${row.category}</td>
-          <td>${row.origin_country}</td>
-          <td>${row.destination_country}</td>
+          <td class="text-center"><input class="form-check-input product-row-checkbox" type="checkbox" data-id="${row.id}" ${selectedProductIds.has(String(row.id)) ? "checked" : ""} aria-label="Select product ${escapeHtml(row.name)}" /></td>
+          <td>${escapeHtml(row.sku)}</td>
+          <td><strong>${escapeHtml(row.name)}</strong></td>
+          <td>${escapeHtml(row.category)}</td>
+          <td>${escapeHtml(row.origin_country)}</td>
+          <td>${escapeHtml(row.destination_country)}</td>
           <td>${window.appUtils.currency(row.unit_price)}</td>
           <td>
-            <strong>${row.quantity}</strong><br />
-            <small class="text-muted">Base ${row.base_quantity} | ${adjustmentLabel}</small>
+            <strong>${escapeHtml(row.quantity)}</strong><br />
+            <small class="text-muted">Base ${escapeHtml(row.base_quantity)} | ${escapeHtml(adjustmentLabel)}</small>
           </td>
           <td>${window.appUtils.badge(row.status)}</td>
           <td>
-            ${row.updated_at}<br />
-            <small class="text-muted">${row.updated_by}</small>
+            ${escapeHtml(row.updated_at)}<br />
+            <small class="text-muted">${escapeHtml(row.updated_by)}</small>
           </td>
           <td>${actions.join("")}</td>
         </tr>`;
@@ -95,11 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchData: async () => window.appUtils.json("/products/api/supervisor/updates"),
         renderRow: (row) => `
           <tr>
-            <td><strong>${row.product_name}</strong><br /><small class="text-muted">${row.product_sku}</small></td>
-            <td>${row.quantity_delta > 0 ? "+" : ""}${row.quantity_delta}</td>
-            <td>${row.remarks || "-"}</td>
-            <td>${row.updated_by}</td>
-            <td>${row.created_at}</td>
+            <td><strong>${escapeHtml(row.product_name)}</strong><br /><small class="text-muted">${escapeHtml(row.product_sku)}</small></td>
+            <td>${row.quantity_delta > 0 ? "+" : ""}${escapeHtml(row.quantity_delta)}</td>
+            <td>${escapeHtml(row.remarks || "-")}</td>
+            <td>${escapeHtml(row.updated_by)}</td>
+            <td>${escapeHtml(row.created_at)}</td>
           </tr>`
       })
     : null;
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedValue = select.value;
     select.innerHTML = '<option value="">Select a product</option>' + mainTable.rows
       .filter((row) => String(row.status).toLowerCase() !== "inactive")
-      .map((row) => `<option value="${row.id}">${row.sku} - ${row.name} (Qty ${row.quantity})</option>`)
+      .map((row) => `<option value="${row.id}">${escapeHtml(row.sku)} - ${escapeHtml(row.name)} (Qty ${escapeHtml(row.quantity)})</option>`)
       .join("");
     select.value = selectedValue;
   };
@@ -237,10 +237,10 @@ document.addEventListener("DOMContentLoaded", () => {
       tableBody.innerHTML = updates.length
         ? updates.map((item) => `
             <tr>
-              <td>${item.quantity_delta > 0 ? "+" : ""}${item.quantity_delta}</td>
-              <td>${item.remarks || "-"}</td>
-              <td>${item.updated_by}</td>
-              <td>${item.created_at}</td>
+              <td>${item.quantity_delta > 0 ? "+" : ""}${escapeHtml(item.quantity_delta)}</td>
+              <td>${escapeHtml(item.remarks || "-")}</td>
+              <td>${escapeHtml(item.updated_by)}</td>
+              <td>${escapeHtml(item.created_at)}</td>
             </tr>`).join("")
         : '<tr><td colspan="4"><div class="empty-state">No product updates found for this product.</div></td></tr>';
       productUpdatesModal?.show();

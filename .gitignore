@@ -68,4 +68,6 @@ __pycache__/
 instance/*.db
 instance/*.db-journal
 
+logs/
+
 .claude

@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+import logging
 from datetime import date
 
 from app.extensions import db
 from app.models import Product, ProductUpdate, TradeRecord, User
 
+logger = logging.getLogger(__name__)
+
 
 def seed_database() -> None:
+    logger.info("seed_database() | Checking if seeding is needed")
     if User.query.first():
+        logger.info("seed_database() | Database already seeded, skipping")
         return
+
+    logger.info("seed_database() | No users found, seeding database with initial data")
 
     admin = User(
         full_name="Aarav Sharma",
@@ -18,6 +25,7 @@ def seed_database() -> None:
         status=User.STATUS_ACTIVE,
     )
     admin.set_password("admin123")
+    logger.info("seed_database() | Created admin user: admin@example.com")
 
     operator = User(
         full_name="Maya Patel",
@@ -27,6 +35,7 @@ def seed_database() -> None:
         status=User.STATUS_ACTIVE,
     )
     operator.set_password("user123")
+    logger.info("seed_database() | Created operator user: maya@example.com")
 
     viewer = User(
         full_name="Rohan Gupta",
@@ -36,6 +45,7 @@ def seed_database() -> None:
         status=User.STATUS_ACTIVE,
     )
     viewer.set_password("user123")
+    logger.info("seed_database() | Created supervisor user: rohan@example.com")
 
     manager = User(
         full_name="Ishita Verma",
@@ -45,9 +55,11 @@ def seed_database() -> None:
         status=User.STATUS_ACTIVE,
     )
     manager.set_password("manager123")
+    logger.info("seed_database() | Created manager user: ishita@example.com")
 
     db.session.add_all([admin, operator, viewer, manager])
     db.session.flush()
+    logger.info("seed_database() | Users flushed to DB")
 
     products = [
         Product(
@@ -89,6 +101,7 @@ def seed_database() -> None:
     ]
     db.session.add_all(products)
     db.session.flush()
+    logger.info("seed_database() | %d products created and flushed", len(products))
 
     db.session.add_all(
         [
@@ -106,6 +119,7 @@ def seed_database() -> None:
             ),
         ]
     )
+    logger.info("seed_database() | Product updates created")
 
     trade_rows = [
         (products[0], "import", 25, 3137.50, date(2026, 1, 15)),
@@ -129,3 +143,4 @@ def seed_database() -> None:
         )
 
     db.session.commit()
+    logger.info("seed_database() | Seeding COMPLETE | %d users, %d products, %d trades", 4, len(products), len(trade_rows))

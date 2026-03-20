@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 from io import BytesIO
 from zipfile import ZIP_DEFLATED, ZipFile
 from xml.sax.saxutils import escape
+
+logger = logging.getLogger(__name__)
 
 
 def _excel_column_name(index: int) -> str:
@@ -99,6 +102,7 @@ def _content_types_xml(sheet_count: int) -> str:
 
 
 def build_workbook(sheet_map: list[tuple[str, list[list]]]) -> bytes:
+    logger.info("build_workbook() | Building workbook with %d sheets: %s", len(sheet_map), [name for name, _ in sheet_map])
     output = BytesIO()
     sheet_names = [name for name, _ in sheet_map]
 
@@ -158,7 +162,10 @@ def build_workbook(sheet_map: list[tuple[str, list[list]]]) -> bytes:
             "</styleSheet>",
         )
 
-        for index, (_, rows) in enumerate(sheet_map, start=1):
+        for index, (sheet_name, rows) in enumerate(sheet_map, start=1):
             archive.writestr(f"xl/worksheets/sheet{index}.xml", _worksheet_xml(rows))
+            logger.debug("build_workbook() | Sheet '%s' written with %d rows", sheet_name, len(rows))
 
-    return output.getvalue()
+    result = output.getvalue()
+    logger.info("build_workbook() | Workbook built successfully | size=%d bytes", len(result))
+    return result
